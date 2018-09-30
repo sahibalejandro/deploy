@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Site;
-
 class DashboardController extends Controller
 {
     /**
-     * Display the dashboard page.
+     * Display the main page.
      *
      * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
     public function index()
     {
-        return view('dashboard')->with(['sites' => Site::all()]);
+        return view('main');
     }
 }

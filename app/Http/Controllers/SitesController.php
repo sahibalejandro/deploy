@@ -9,13 +9,13 @@ use App\Jobs\CloneSiteRepository;
 class SitesController extends Controller
 {
     /**
-     * Display the form to create a new site.
+     * Return the list for the current authenticated user.
      *
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function create()
+    public function index()
     {
-        return view('sites.create');
+        return auth()->user()->sites;
     }
 
     /**

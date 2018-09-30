@@ -20,15 +20,23 @@ if (!app()->runningInConsole()) {
 }
 
 /*
- * Dashboard
+ * API
+ * For simplicity purposes we will use the web routes as api routes.
  */
-Route::get('/', 'DashboardController@index');
+Route::group(['prefix' => 'api'], function () {
+    Route::get('/sites', 'SitesController@index');
+});
+
+/*
+ * Main Page
+ */
+Route::get('{all}', 'DashboardController@index')->where('all', '.*');
 
 /*
  * Sites
  */
-Route::get('/sites/create', 'SitesController@create');
-Route::post('/sites', 'SitesController@store');
-Route::get('/sites/{site}', 'SitesController@show');
-Route::delete('/sites/{site}', 'SitesController@destroy');
-Route::post('/sites/{site}/deploy', 'SitesController@deploy');
+//Route::get('/sites/create', 'SitesController@create');
+//Route::post('/sites', 'SitesController@store');
+//Route::get('/sites/{site}', 'SitesController@show');
+//Route::delete('/sites/{site}', 'SitesController@destroy');
+//Route::post('/sites/{site}/deploy', 'SitesController@deploy');
