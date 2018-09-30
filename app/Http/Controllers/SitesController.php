@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Site;
 use Illuminate\Http\Request;
+use App\Jobs\CloneSiteRepository;
 
 class SitesController extends Controller
 {
@@ -26,11 +27,15 @@ class SitesController extends Controller
     public function store(Request $request)
     {
         $site = auth()->user()->sites()->save(
-            new Site($request->only('name'))
+            new Site($request->only('name', 'repository'))
         );
 
+        // Dispatch the job to clone the repository, this job
+        // is queued and handled by the super queue worker.
+        CloneSiteRepository::dispatch($site);
+
         alert("The new site was created.");
-        return redirect('/');
+        return redirect("/sites/{$site->id}");
     }
 
     /**
@@ -52,6 +57,7 @@ class SitesController extends Controller
      */
     public function destroy(Site $site)
     {
+        // TODO: Delete the entire site's directory.
         $site->delete();
 
         alert('Site is deleted.');

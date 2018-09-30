@@ -31,3 +31,4 @@ Route::get('/sites/create', 'SitesController@create');
 Route::post('/sites', 'SitesController@store');
 Route::get('/sites/{site}', 'SitesController@show');
 Route::delete('/sites/{site}', 'SitesController@destroy');
+Route::post('/sites/{site}/deploy', 'SitesController@deploy');
