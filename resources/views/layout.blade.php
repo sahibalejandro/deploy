@@ -6,14 +6,11 @@
         <title>{{ config('app.name') }}</title>
     </head>
     <body>
-        <h1>Dashboard</h1>
-
-        <h2>Sites</h2>
-        @foreach ($sites as $site)
-            <div>
-                {{ $site->name }}
-            </div>
-        @endforeach
-
+        <p>
+            <a href="/">Dashboard</a> -
+            Signed as: {{ auth()->user()->name }}
+        </p>
+        {!! alert() !!}
+        @yield('content')
     </body>
 </html>
