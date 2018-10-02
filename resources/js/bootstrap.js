@@ -25,6 +25,12 @@ window.axios = require('axios');
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /**
+ * Attach the customized axios instance to the Form object, this is needed
+ * to ensure the form uses the given axios instance on all the requests.
+ */
+require('form-object').defaults.axios = window.axios;
+
+/**
  * Next we will register the CSRF Token as a common header with Axios so that
  * all outgoing HTTP requests automatically have it attached. This is just
  * a simple convenience so we don't have to attach every token manually.
