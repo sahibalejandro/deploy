@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2>Sites</h2>
-
+        <router-link :to="{ name: 'sites.create' }">Add new site</router-link>
         <ul>
             <li v-for="site in sites">
                 <router-link :to="{ name: 'sites.show', params: { id: site.id } }">{{ site.name }}</router-link>

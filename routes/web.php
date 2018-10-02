@@ -25,6 +25,8 @@ if (!app()->runningInConsole()) {
  */
 Route::group(['prefix' => 'api'], function () {
     Route::get('/sites', 'SitesController@index');
+    Route::post('/sites', 'SitesController@store');
+    Route::get('/sites/{site}', 'SitesController@show');
 });
 
 /*
@@ -36,7 +38,5 @@ Route::get('{all}', 'DashboardController@index')->where('all', '.*');
  * Sites
  */
 //Route::get('/sites/create', 'SitesController@create');
-//Route::post('/sites', 'SitesController@store');
-//Route::get('/sites/{site}', 'SitesController@show');
 //Route::delete('/sites/{site}', 'SitesController@destroy');
 //Route::post('/sites/{site}/deploy', 'SitesController@deploy');

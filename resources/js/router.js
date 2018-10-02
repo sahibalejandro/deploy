@@ -7,7 +7,12 @@ const router = new VueRouter({
     routes: [
         {
             path: '/',
-            component: require('./components/the-dashboard.vue')
+            component: require('./components/the-dashboard.vue'),
+        },
+        {
+            path: '/sites/create',
+            name: 'sites.create',
+            component: require('./components/sites-create.vue'),
         },
         {
             path: '/sites/:id',

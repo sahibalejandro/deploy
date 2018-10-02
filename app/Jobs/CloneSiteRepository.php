@@ -52,7 +52,7 @@ class CloneSiteRepository implements ShouldQueue
         $process->run();
 
         if ($process->isSuccessful()) {
-            $this->site->cloned = true;
+            $this->site->installed = true;
             $this->site->save();
         } else {
             // TODO: Find a way to notify the user that the repository couldn't

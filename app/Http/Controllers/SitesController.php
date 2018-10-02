@@ -22,7 +22,7 @@ class SitesController extends Controller
      * Create a new site assigned to the current authenticated user.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -34,19 +34,18 @@ class SitesController extends Controller
         // is queued and handled by the super queue worker.
         CloneSiteRepository::dispatch($site);
 
-        alert("The new site was created.");
-        return redirect("/sites/{$site->id}");
+        return $site;
     }
 
     /**
      * Display the detail page for the given site.
      *
      * @param  \App\Site $site
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Site $site)
     {
-        return view('sites.show')->with(compact('site'));
+        return $site;
     }
 
     /**
