@@ -1,31 +1,36 @@
 <template>
     <div>
-        <h1>
-            Site {{ site.name }}
-        </h1>
+        <h3>Site {{ site.name }}</h3>
         <p>
             <strong>Repository:</strong>
             {{ site.repository }}
         </p>
         <p>
-            <strong>Installation:</strong>
-            <div v-if="status.installed">
-                Site installed correctly.
+            <h4 class="border-bottom">Status</h4>
+            <div v-if="status.installed" class="alert alert-success">
+                Site is installed correctly.
             </div>
             <div v-if="status.install_error">
-                <div>
-                    An error occurred during site installation:<br/>
-                    {{ status.install_error}}
+                <div class="alert alert-danger">
+                    <strong>An error occurred during site installation:</strong>
+                    <div class="text-monospace">{{ status.install_error}}</div>
                 </div>
             </div>
-            <div v-if="installationIsPending()">
-                ...
+            <div v-if="installationIsPending()" class="text-muted">
+                Obtaining site status, please wait.
             </div>
-            <div>
-                Site reinstall?<br/>
-                <button type="button" @click="reinstall" :disabled="installationIsPending()">
-                    Re-install
-                </button>
+
+            <h4 class="border-bottom">Reinstall</h4>
+            <p> In case you need to reinstall the site, you can do it by pressing this scary button.<br/> </p>
+            <div class="alert alert-warning">
+                <div class="text-center">
+                    <p>
+                        <strong>All files will be deleted, this action cannot be undone!</strong>
+                    </p>
+                    <button class="btn btn-danger" type="button" @click="reinstall" :disabled="installationIsPending()">
+                        Delete all the files and reinstall
+                    </button>
+                </div>
             </div>
         </p>
     </div>

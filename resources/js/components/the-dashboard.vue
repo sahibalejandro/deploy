@@ -1,7 +1,12 @@
 <template>
     <div>
-        <h1>Dashboard</h1>
-        <sites-list />
+        <h2>Dashboard</h2>
+        <div class="lead">
+            This is the Dashboard, here you will find useful information.
+        </div>
+        <div class="mt-5">
+            <sites-list />
+        </div>
     </div>
 </template>
 

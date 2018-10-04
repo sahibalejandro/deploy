@@ -1,14 +1,12 @@
-
 // Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
+@import url('https://fonts.googleapis.com/css?family=Lobster&text=Deployr');
 
-// Variables
-@import 'variables';
+html {
+    font-size: 16px;
+}
 
-// Bootstrap
-@import '~bootstrap/scss/bootstrap';
-
-.navbar-laravel {
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+.navbar-brand {
+    font-family: 'Lobster', cursive;
+    font-size: 1.8rem;
+    margin-top: -7px;
 }
