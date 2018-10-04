@@ -38,10 +38,24 @@ class CloneSiteRepository implements ShouldQueue
      */
     public function handle()
     {
-        // TODO: Validate that this path does not exists before
-        // we execute the process to start cloning the repo.
+        // This is the path where the site will be installed.
         $path = config('deploy.path') . "/site_{$this->site->id}";
 
+        // Abort the installation process if the path exists or if it cannot
+        // be created, in those cases we mark the installation as failed.
+        if (file_exists($path)) {
+            $this->failedInstallation("Directory {$path} already exists");
+            return;
+        }
+
+        if (!mkdir($path, 0766, true)) {
+            $this->failedInstallation("Can't create directory {$path}");
+            return;
+        }
+
+        // Create the process to clone the site's repository into the desired
+        // directory, if anything goes wrong with this process we mark the
+        // installation as failed and the user will need to reinstall.
         $process = new Process([
             'git',
             'clone',
@@ -49,14 +63,37 @@ class CloneSiteRepository implements ShouldQueue
             $path,
         ]);
 
-        $process->run();
-
-        if ($process->isSuccessful()) {
-            $this->site->installed = true;
-            $this->site->save();
-        } else {
-            // TODO: Find a way to notify the user that the repository couldn't
-            // be cloned, and we should display a button to try this again.
+        try {
+            $process->mustRun();
+            $this->successfulInstallation();
+        } catch (ProcessFailedException $e) {
+            $this->failedInstallation($e->getMessage);
         }
+    }
+
+    /**
+     * Sets the installation error message for the current site and marks it
+     * as not installed.
+     *
+     * @return void
+     */
+    public function failedInstallation($error)
+    {
+        $this->site->install_error = $error;
+        $this->site->installed = false;
+        $this->site->save();
+    }
+
+    /**
+     * Clear the installation error message for the current site and marks it
+     * as installed.
+     *
+     * @return void
+     */
+    public function successfulInstallation()
+    {
+        $this->site->install_error = null;
+        $this->site->installed = true;
+        $this->site->save();
     }
 }

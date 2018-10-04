@@ -49,6 +49,19 @@ class SitesController extends Controller
     }
 
     /**
+     * Return the status for the given site.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function status(Site $site)
+    {
+        return $site->only([
+            'installed',
+            'install_error',
+        ]);
+    }
+
+    /**
      * Delete the given site.
      *
      * @param  \App\Site $site

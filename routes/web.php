@@ -27,6 +27,7 @@ Route::group(['prefix' => 'api'], function () {
     Route::get('/sites', 'SitesController@index');
     Route::post('/sites', 'SitesController@store');
     Route::get('/sites/{site}', 'SitesController@show');
+    Route::get('/sites/{site}/status', 'SitesController@status');
 });
 
 /*

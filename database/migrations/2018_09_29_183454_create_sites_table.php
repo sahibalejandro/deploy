@@ -19,6 +19,7 @@ class CreateSitesTable extends Migration
             $table->string('name');
             $table->string('repository');
             $table->boolean('installed')->default(false);
+            $table->text('install_error')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');
