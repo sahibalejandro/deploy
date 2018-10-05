@@ -12,6 +12,7 @@
 */
 
 // TODO: Remove this autologin, this is temporal just for development purposes.
+Log::info('fo');
 use Illuminate\Support\Facades\Auth;
 if (!app()->runningInConsole()) {
     if (!Auth::check()) {
@@ -28,16 +29,12 @@ Route::group(['prefix' => 'api'], function () {
     Route::post('/sites', 'SitesController@store');
     Route::get('/sites/{site}', 'SitesController@show');
     Route::get('/sites/{site}/status', 'SitesController@status');
+
+    Route::get('/databases', 'DatabasesController@index');
+    Route::post('/databases', 'DatabasesController@store');
 });
 
 /*
  * Main Page
  */
 Route::get('{all}', 'DashboardController@index')->where('all', '.*');
-
-/*
- * Sites
- */
-//Route::get('/sites/create', 'SitesController@create');
-//Route::delete('/sites/{site}', 'SitesController@destroy');
-//Route::post('/sites/{site}/deploy', 'SitesController@deploy');

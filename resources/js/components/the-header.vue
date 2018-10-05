@@ -4,19 +4,19 @@
             <router-link class="navbar-brand" to="/">Deployer</router-link>
             <!-- General Menu -->
             <ul class="navbar-nav mr-auto">
-               <li class="navbar-item">
+                <li class="navbar-item">
                     <router-link class="nav-link" to="/">Dashboard</router-link>
-               </li>
+                </li>
+                <li class="navbar-item">
+                    <router-link class="nav-link" to="/databases">Databases</router-link>
+                </li>
             </ul>
 
             <!-- User Menu -->
             <ul class="navbar-nav">
                 <li class="navbar-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link dropdown-toggle">
                         Sahib
-                        <span class="badge badge-pill badge-secondary">
-                            &#183;&#183;&#183;
-                        </span>
                     </a>
                 </li>
             </ul>

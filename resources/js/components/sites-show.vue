@@ -1,38 +1,31 @@
 <template>
     <div>
-        <h3>Site {{ site.name }}</h3>
-        <p>
-            <strong>Repository:</strong>
-            {{ site.repository }}
-        </p>
-        <p>
-            <h4 class="border-bottom">Status</h4>
-            <div v-if="status.installed" class="alert alert-success">
-                Site is installed correctly.
-            </div>
-            <div v-if="status.install_error">
-                <div class="alert alert-danger">
-                    <strong>An error occurred during site installation:</strong>
-                    <div class="text-monospace">{{ status.install_error}}</div>
-                </div>
-            </div>
-            <div v-if="installationIsPending()" class="text-muted">
-                Obtaining site status, please wait.
-            </div>
+        <h4>Site {{ site.name }}</h4>
 
-            <h4 class="border-bottom">Reinstall</h4>
-            <p> In case you need to reinstall the site, you can do it by pressing this scary button.<br/> </p>
-            <div class="alert alert-warning">
-                <div class="text-center">
-                    <p>
-                        <strong>All files will be deleted, this action cannot be undone!</strong>
-                    </p>
-                    <button class="btn btn-danger" type="button" @click="reinstall" :disabled="installationIsPending()">
-                        Delete all the files and reinstall
-                    </button>
-                </div>
+        <!-- Site's information -->
+        <strong>Repository:</strong>
+        {{ site.repository }}
+
+        <!-- Site status -->
+        <h5 class="border-bottom">Status</h5>
+
+        <!-- Status: Installed -->
+        <div v-if="site.installed" class="alert alert-success">
+            Site is installed correctly.
+        </div>
+
+        <!-- Status: Installation failed -->
+        <div v-if="site.install_error">
+            <div class="alert alert-danger">
+                <strong>An error occurred during site installation:</strong>
+                <div class="text-monospace">{{ site.install_error}}</div>
             </div>
-        </p>
+        </div>
+
+        <!-- Status: Installation running -->
+        <div v-if="installationIsPending()" class="text-muted">
+            Installing the site, this can take a while.
+        </div>
     </div>
 </template>
 
@@ -44,7 +37,7 @@ export default {
      *
      * @var Number
      */
-    monitorInterval: null,
+    refreshInterval: null,
 
     /**
      * Returns the component's data.
@@ -56,13 +49,13 @@ export default {
             /**
              * Site data.
              */
-            site: { name: null, repository: null },
-
-            /**
-             * Site status.
-             */
-            status: {installed: false, install_error: null},
-        }
+            site: {
+                name: null,
+                repository: null,
+                installed: null,
+                install_error: null,
+            },
+        };
     },
 
     /**
@@ -71,8 +64,12 @@ export default {
      * @return void
      */
     created() {
-        this.loadSite();
-        this.startMonitoring();
+        this.loadSiteData();
+        this.startRefreshing();
+    },
+
+    beforeDestroy() {
+        this.stopRefreshing();
     },
 
     methods: {
@@ -81,11 +78,12 @@ export default {
          *
          * @return void
          */
-        async loadSite() {
+        async loadSiteData() {
             try {
-                const res = await axios.get(`/api/sites/${this.$route.params.id}`);
-                this.site = res.data;
+                let {data} = await axios.get(`/api/sites/${this.$route.params.id}`);
+                this.site = data;
             } catch (err) {
+                // TODO: Display an alert to notify that the site doesn't exists.
                 if (err.response && err.response.status === 404) {
                     this.$router.push('/');
                 }
@@ -97,13 +95,13 @@ export default {
          *
          * @return void
          */
-        startMonitoring() {
+        startRefreshing() {
             // This is to avoid start multiple setInterval(...) by mistake.
-            if (this.$options.monitorInterval) {
+            if (this.$options.refreshInterval) {
                 return;
             }
 
-            this.$options.monitorInterval = setInterval(this.getStatus, 3000);
+            this.$options.refreshInterval = setInterval(this.refreshData, 3000);
         },
 
         /**
@@ -111,49 +109,24 @@ export default {
          *
          * @return void
          */
-        stopMonitoring() {
-            clearInterval(this.$options.monitorInterval);
-            this.$options.monitorInterval = null;
+        stopRefreshing() {
+            clearInterval(this.$options.refreshInterval);
+            this.$options.refreshInterval = null;
         },
 
         /**
-         * Get the status from the API and trigger the update status method.
+         * Get the site information from the API and trigger the update status
+         * method.
          *
          * @return void
          */
-        async getStatus() {
-            try {
-                const res = await axios.get(`/api/sites/${this.site.id}/status`);
-                this.updateStatus(res.data);
-            } catch (err) {
-                console.log('Unable to get site status', err);
-            }
-        },
-
-        /**
-         * Update and validate the current site status.
-         *
-         * @return void
-         */
-        updateStatus(status) {
-            this.status = status;
+        refreshData() {
+            this.loadSiteData();
 
             // Stop making requests for new status if the installation failed.
-            if (status.install_error !== null) {
-                this.stopMonitoring();
+            if (this.site.install_error !== null) {
+                this.stopRefreshing();
             }
-        },
-
-        /**
-         * Trigger the reinstall process.
-         *
-         * @return void
-         */
-        reinstall() {
-            this.status.installed = false;
-            this.status.install_error = null;
-            this.startMonitoring();
-            console.log('Trigger the reinstall process.');
         },
 
         /**
@@ -164,7 +137,7 @@ export default {
         installationIsPending() {
             // If the site is not installed and there is no installation
             // error then we can say that the installation is running.
-            return !this.status.installed && !this.status.install_error;
+            return !this.site.installed && !this.site.install_error;
         }
     }
 }

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h3>Add new site</h3>
+        <h4>Add new site</h4>
         <form @submit.prevent="submit">
             <div class="form-group">
                 <label for="name">Site name:</label>

@@ -18,7 +18,18 @@ const router = new VueRouter({
             path: '/sites/:id',
             name: 'sites.show',
             component: require('./components/sites-show.vue'),
-        }
+        },
+
+        {
+            path: '/databases',
+            name: 'databases.index',
+            component: require('./components/databases-index.vue'),
+        },
+        {
+            path: '/databases/create',
+            name: 'databases.create',
+            component: require('./components/databases-create.vue'),
+        },
     ]
 });
 

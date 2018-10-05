@@ -37,4 +37,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Site::class);
     }
+
+    /**
+     * User databases.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function databases()
+    {
+        return $this->hasMany(Database::class);
+    }
 }

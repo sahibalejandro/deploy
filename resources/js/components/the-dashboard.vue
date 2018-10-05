@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>Dashboard</h2>
+        <h4>Dashboard</h4>
         <div class="lead">
             This is the Dashboard, here you will find useful information.
         </div>
