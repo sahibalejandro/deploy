@@ -15,6 +15,7 @@
             <tbody>
                 <tr v-for="database in databases">
                     <td>{{ database.name }}</td>
+                    <td>{{ database.created_at }}</td>
                 </tr>
             </tbody>
         </table>
@@ -35,7 +36,7 @@ export default {
 
     methods: {
         async loadDatabasesData() {
-            let {data} = await axios.get('/api/databases');
+            let {data} = await axios.get('databases');
             this.databases = data;
         }
     }

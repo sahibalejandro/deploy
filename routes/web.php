@@ -12,8 +12,8 @@
 */
 
 // TODO: Remove this autologin, this is temporal just for development purposes.
-Log::info('fo');
 use Illuminate\Support\Facades\Auth;
+
 if (!app()->runningInConsole()) {
     if (!Auth::check()) {
         Auth::login(App\User::first(), true);
@@ -25,11 +25,17 @@ if (!app()->runningInConsole()) {
  * For simplicity purposes we will use the web routes as api routes.
  */
 Route::group(['prefix' => 'api'], function () {
+    /*
+     * Sites.
+     */
     Route::get('/sites', 'SitesController@index');
     Route::post('/sites', 'SitesController@store');
     Route::get('/sites/{site}', 'SitesController@show');
     Route::get('/sites/{site}/status', 'SitesController@status');
 
+    /*
+     * Databases.
+     */
     Route::get('/databases', 'DatabasesController@index');
     Route::post('/databases', 'DatabasesController@store');
 });

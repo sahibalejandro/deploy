@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Database;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Http\Requests\StoreDatabase;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class DatabasesController extends Controller
 {
@@ -13,10 +15,10 @@ class DatabasesController extends Controller
         return auth()->user()->databases;
     }
 
-    public function store(Request $request)
+    public function store(StoreDatabase $request)
     {
         $process = new Process([
-            './scripts/create-database',
+            base_path('scripts/create-database'),
             $request->name,
             $request->user,
             $request->password,
@@ -24,7 +26,7 @@ class DatabasesController extends Controller
 
         try {
             $process->mustRun();
-        } catch (\Exception $e) {
+        } catch (ProcessFailedException $e) {
             return response()->json(
                 ['error' => "Unable to create database. ({$e->getMessage()})"],
                 500
@@ -36,3 +38,4 @@ class DatabasesController extends Controller
         return response()->json($database, 201);
     }
 }
+
