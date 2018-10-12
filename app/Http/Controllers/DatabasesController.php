@@ -10,11 +10,21 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class DatabasesController extends Controller
 {
+    /**
+     * Returns a list of databases for the current authenticated user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         return auth()->user()->databases;
     }
 
+    /**
+     * Create a new database for the current authenticated user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(StoreDatabase $request)
     {
         $process = new Process([
@@ -27,15 +37,38 @@ class DatabasesController extends Controller
         try {
             $process->mustRun();
         } catch (ProcessFailedException $e) {
-            return response()->json(
-                ['error' => "Unable to create database. ({$e->getMessage()})"],
-                500
-            );
+            $message = "Unable to create database \"{$request->name}\". ({$e->getMessage()})";
+            Log::error($message);
+            return response()->json(['error' => $message], 500);
         }
 
         $database = new Database($request->only('name', 'user'));
         auth()->user()->databases()->save($database);
         return response()->json($database, 201);
     }
-}
 
+    /**
+     * Drop a database and its related user, this only works for databases that
+     * belongs to the current authenticated user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(Database $database)
+    {
+        $process = new Process([
+            base_path('scripts/delete-database'),
+            $database->name,
+            $database->user
+        ]);
+
+        try {
+            $process->mustRun();
+        } catch (ProcessFailedException $e) {
+            $message = "Unable to delete database \"{$database->name}\". ({$e->getMessage()})";
+            Log::error($message);
+            return response()->json(['error' => $message], 500);
+        }
+
+        $database->delete();
+    }
+}

@@ -38,6 +38,7 @@ Route::group(['prefix' => 'api'], function () {
      */
     Route::get('/databases', 'DatabasesController@index');
     Route::post('/databases', 'DatabasesController@store');
+    Route::delete('/databases/{database}', 'DatabasesController@destroy');
 });
 
 /*

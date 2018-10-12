@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+DATABASE=$1
+USER=$2
+
+mysql -uroot -e "DROP DATABASE IF EXISTS $DATABASE;"
+mysql -uroot -e "DROP USER IF EXISTS '$USER'@'localhost';"
+mysql -uroot -e "FLUSH PRIVILEGES;"

@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use PDO;
 use App\User;
+use App\Database;
+use PDOException;
 use Tests\TestCase;
 use Symfony\Component\Process\Process;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -46,13 +49,39 @@ class DatabasesTest extends TestCase
      */
     protected function deleteTestDatabase()
     {
-        $process = new Process(base_path('scripts/delete-test-database'));
+        $process = new Process([
+            base_path('scripts/delete-database'),
+            '_test_database',
+            '_test_user',
+        ]);
 
         try {
             $process->mustRun();
         } catch (ProcessFailedException $e) {
             $this->fail("Failed to delete the test database ({$e->getMessage()}).");
         }
+    }
+
+    /**
+     * Creates a test database.
+     *
+     * @return \App\Database
+     */
+    protected function createTestDatabase()
+    {
+        $database = factory(Database::class)
+            ->create(['user_id' => $this->user->id]);
+
+        $process = new Process([
+            base_path('scripts/create-database'),
+            $database->name,
+            $database->user,
+            'secretpassword',
+        ]);
+
+        $process->mustRun();
+
+        return $database;
     }
 
     /**
@@ -67,17 +96,44 @@ class DatabasesTest extends TestCase
     protected function assertDatabaseConnection($database, $user, $password)
     {
         try {
-            $pdo = new \PDO("mysql:dbname={$database};host=127.0.0.1", $user, $password);
-        } catch (\PDOException $e) {
+            $pdo = new PDO("mysql:dbname={$database};host=127.0.0.1", $user, $password);
+        } catch (PDOException $e) {
             $this->fail("Unable to connect to database \"{$database}\". ({$e->getMessage()})");
         }
 
         return $this;
     }
 
-    /*
-     * Tests starts here!
+    /**
+     * Assert that the given database and user does not exists.
+     *
+     * @param  string $database
+     * @param  string $user
+     * @return $this
      */
+    protected function assertDatabaseAndUserDoesNotExists($database, $user)
+    {
+        $config = config('database.connections.mysql');
+        $pdo = new PDO('mysql:host=127.0.0.1', $config['username'], $config['password']);
+
+        // First check that the database does not exists.
+        $rows = $pdo->query('SHOW DATABASES;')->fetchAll(PDO::FETCH_OBJ);
+        foreach ($rows as $row) {
+            if ($row->Database === $database) {
+                $this->fail("Database \"{$database}\" should not exists.");
+            }
+        }
+
+        // Check that the user does not exists.
+        $query = $pdo->prepare('SELECT COUNT(*) AS `count` FROM mysql.user WHERE User=?');
+        $query->execute([$user]);
+        $rows = $query->fetchAll(PDO::FETCH_OBJ);
+        if (intval($rows[0]->count) !== 0) {
+            $this->fail("User \"{$user}\" should not exists.");
+        }
+
+        return $this;
+    }
 
     public function test_all_fields_are_required()
     {
@@ -123,20 +179,15 @@ class DatabasesTest extends TestCase
             ->assertJsonValidationErrors(['user']);
     }
 
-    /** @test */
-    public function it_creates_a_new_database()
+    public function test_creates_a_new_database()
     {
         $dbName = '_test_database';
         $dbUser = '_test_user';
         $dbPass = 'secretpassword';
+        $input = ['name' => $dbName, 'user' => $dbUser, 'password' => $dbPass];
 
-        $response = $this->json('POST', '/api/databases', [
-                'name' => $dbName,
-                'user' => $dbUser,
-                'password' => $dbPass,
-            ]);
-
-        $response->assertStatus(201)
+        $this->json('POST', '/api/databases', $input)
+            ->assertStatus(201)
             ->assertJson([
                 'user_id' => $this->user->id,
                 'name' => $dbName,
@@ -150,5 +201,15 @@ class DatabasesTest extends TestCase
         ]);
 
         $this->assertDatabaseConnection($dbName, $dbUser, $dbPass);
+    }
+
+    public function test_delete_database()
+    {
+        $database = $this->createTestDatabase();
+
+        $this->json('DELETE', "/api/databases/{$database->id}")
+            ->assertStatus(200);
+
+        $this->assertDatabaseAndUserDoesNotExists($database->name, $database->user);
     }
 }
