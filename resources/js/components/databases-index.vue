@@ -16,11 +16,16 @@
             </thead>
             <tbody>
                 <tr v-for="database in databases">
-                    <td>{{ database.name }}</td>
+                    <td><code class="text-success">{{ database.name }}</code></td>
                     <td><code>{{ database.user }}</code></td>
                     <td>{{ database.created_at }}</td>
                     <td>
-                        <button class="btn btn-sm btn-danger">&times;</button>
+                        <delete-resource
+                            :resource="database"
+                            endpoint="databases"
+                            class="btn-sm"
+                            @delete="removeFromList(database)"
+                        >&times;</delete-resource>
                     </td>
                 </tr>
             </tbody>
@@ -29,7 +34,11 @@
 </template>
 
 <script>
+import DeleteResource from './utils/delete-resource.vue';
+
 export default {
+    components: {DeleteResource},
+
     data() {
         return {
             databases: [],
@@ -44,7 +53,11 @@ export default {
         async loadDatabasesData() {
             let {data} = await axios.get('databases');
             this.databases = data;
-        }
+        },
+
+        removeFromList(database) {
+            this.databases = this.databases.filter(d => d.id !== database.id);
+        },
     }
 }
 </script>
