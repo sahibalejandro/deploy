@@ -55,6 +55,10 @@ class DatabasesController extends Controller
      */
     public function destroy(Database $database)
     {
+        if (!auth()->user()->owns($database)) {
+            return response()->json([], 403);
+        }
+
         $process = new Process([
             base_path('scripts/delete-database'),
             $database->name,

@@ -65,18 +65,20 @@ class DatabasesTest extends TestCase
     /**
      * Creates a test database.
      *
+     * @param  string $password
      * @return \App\Database
      */
-    protected function createTestDatabase()
+    protected function createTestDatabase($password = 'secretpassword')
     {
-        $database = factory(Database::class)
-            ->create(['user_id' => $this->user->id]);
+        $database = factory(Database::class)->create([
+            'user_id' => $this->user->id,
+        ]);
 
         $process = new Process([
             base_path('scripts/create-database'),
             $database->name,
             $database->user,
-            'secretpassword',
+            $password,
         ]);
 
         $process->mustRun();
@@ -201,6 +203,23 @@ class DatabasesTest extends TestCase
         ]);
 
         $this->assertDatabaseConnection($dbName, $dbUser, $dbPass);
+    }
+
+    public function test_user_cannot_delete_a_database_that_belongs_to_another_user()
+    {
+        $databasePassword = 'secretpassword';
+        $database = $this->createTestDatabase($databasePassword);
+        $user = factory(User::class)->create();
+
+        $this->actingAs($user)
+            ->json('DELETE', "/api/databases/{$database->id}")
+            ->assertStatus(403);
+
+        $this->assertDatabaseConnection(
+            $database->name,
+            $database->user,
+            $databasePassword
+        );
     }
 
     public function test_delete_database()

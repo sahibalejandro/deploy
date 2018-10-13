@@ -47,4 +47,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Database::class);
     }
+
+    /**
+     * Returns true if the given $entity belongs to this user.
+     *
+     * @param  Object $entity
+     * @return bool
+     */
+    public function owns($entity)
+    {
+        return intval($this->id) === intval($entity->user_id);
+    }
 }
