@@ -42,6 +42,119 @@ class DatabasesTest extends TestCase
         parent::tearDown();
     }
 
+    /** @test */
+    public function it_checks_that_all_fields_are_required()
+    {
+        $this->json('POST', '/api/databases', [])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['name', 'user', 'password']);
+    }
+
+    /** @test */
+    public function it_checks_if_the_database_name_field_is_invalid()
+    {
+        // Test that no spaces are allowed.
+        $this->json('POST', '/api/databases', ['name' => ' '])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
+
+        // Test that no special chars are allowed.
+        $this->json('POST', '/api/databases', ['name' => '.'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
+
+        // Test that no dashes are allowed.
+        $this->json('POST', '/api/databases', ['name' => '-'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
+    }
+
+    /** @test */
+    public function it_checks_if_the_user_field_is_invalid()
+    {
+        $this->json('POST', '/api/databases', ['user' => ' '])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['user']);
+
+        $this->json('POST', '/api/databases', ['user' => '.'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['user']);
+
+        $this->json('POST', '/api/databases', ['user' => 'short'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['user']);
+
+        $this->json('POST', '/api/databases', ['user' => 'loooooooooooooong'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['user']);
+    }
+
+    /** @test */
+    public function do_not_create_new_database_if_it_already_exists()
+    {
+        $database = $this->createTestDatabase();
+
+        $this->json('POST', '/api/databases', [
+            'name' => $database->name,
+            'user' => 'another_user',
+            'password' => 'secretpassword',
+        ])->assertStatus(400);
+    }
+
+    /** @test */
+    public function it_creates_a_new_database()
+    {
+        $dbName = '_test_database';
+        $dbUser = '_test_user';
+        $dbPass = 'secretpassword';
+        $input = ['name' => $dbName, 'user' => $dbUser, 'password' => $dbPass];
+
+        $this->json('POST', '/api/databases', $input)
+            ->assertStatus(201)
+            ->assertJson([
+                'user_id' => $this->user->id,
+                'name' => $dbName,
+                'user' => $dbUser,
+            ]);
+
+        $this->assertDatabaseHas('databases', [
+            'user_id' => $this->user->id,
+            'name' => $dbName,
+            'user' => $dbUser,
+        ]);
+
+        $this->assertDatabaseConnection($dbName, $dbUser, $dbPass);
+    }
+
+    /** @test */
+    public function the_user_cannot_delete_a_database_that_belongs_to_another_user()
+    {
+        $databasePassword = 'secretpassword';
+        $database = $this->createTestDatabase($databasePassword);
+        $user = factory(User::class)->create();
+
+        $this->actingAs($user)
+            ->json('DELETE', "/api/databases/{$database->id}")
+            ->assertStatus(403);
+
+        $this->assertDatabaseConnection(
+            $database->name,
+            $database->user,
+            $databasePassword
+        );
+    }
+
+    /** @test */
+    public function it_deletes_an_existing_database()
+    {
+        $database = $this->createTestDatabase();
+
+        $this->json('DELETE', "/api/databases/{$database->id}")
+            ->assertStatus(200);
+
+        $this->assertDatabaseAndUserDoesNotExists($database->name, $database->user);
+    }
+
     /**
      * Delete the database created during the test.
      *
@@ -135,112 +248,5 @@ class DatabasesTest extends TestCase
         }
 
         return $this;
-    }
-
-    public function test_all_fields_are_required()
-    {
-        $this->json('POST', '/api/databases', [])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['name', 'user', 'password']);
-    }
-
-    public function test_database_name_field_is_invalid()
-    {
-        // Test that no spaces are allowed.
-        $this->json('POST', '/api/databases', ['name' => ' '])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['name']);
-
-        // Test that no special chars are allowed.
-        $this->json('POST', '/api/databases', ['name' => '.'])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['name']);
-
-        // Test that no dashes are allowed.
-        $this->json('POST', '/api/databases', ['name' => '-'])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['name']);
-    }
-
-    public function test_user_field_is_invalid()
-    {
-        $this->json('POST', '/api/databases', ['user' => ' '])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['user']);
-
-        $this->json('POST', '/api/databases', ['user' => '.'])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['user']);
-
-        $this->json('POST', '/api/databases', ['user' => 'short'])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['user']);
-
-        $this->json('POST', '/api/databases', ['user' => 'loooooooooooooong'])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['user']);
-    }
-
-    /** @test */
-    public function do_not_create_new_database_if_it_already_exists()
-    {
-        $database = $this->createTestDatabase();
-
-        $this->json('POST', '/api/databases', [
-            'name' => $database->name,
-            'user' => 'another_user',
-            'password' => 'secretpassword',
-        ])->assertStatus(400);
-    }
-
-    public function test_creates_a_new_database()
-    {
-        $dbName = '_test_database';
-        $dbUser = '_test_user';
-        $dbPass = 'secretpassword';
-        $input = ['name' => $dbName, 'user' => $dbUser, 'password' => $dbPass];
-
-        $this->json('POST', '/api/databases', $input)
-            ->assertStatus(201)
-            ->assertJson([
-                'user_id' => $this->user->id,
-                'name' => $dbName,
-                'user' => $dbUser,
-            ]);
-
-        $this->assertDatabaseHas('databases', [
-            'user_id' => $this->user->id,
-            'name' => $dbName,
-            'user' => $dbUser,
-        ]);
-
-        $this->assertDatabaseConnection($dbName, $dbUser, $dbPass);
-    }
-
-    public function test_user_cannot_delete_a_database_that_belongs_to_another_user()
-    {
-        $databasePassword = 'secretpassword';
-        $database = $this->createTestDatabase($databasePassword);
-        $user = factory(User::class)->create();
-
-        $this->actingAs($user)
-            ->json('DELETE', "/api/databases/{$database->id}")
-            ->assertStatus(403);
-
-        $this->assertDatabaseConnection(
-            $database->name,
-            $database->user,
-            $databasePassword
-        );
-    }
-
-    public function test_delete_database()
-    {
-        $database = $this->createTestDatabase();
-
-        $this->json('DELETE', "/api/databases/{$database->id}")
-            ->assertStatus(200);
-
-        $this->assertDatabaseAndUserDoesNotExists($database->name, $database->user);
     }
 }
