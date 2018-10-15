@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use PDO;
 use App\Database;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\StoreDatabase;
@@ -21,12 +22,39 @@ class DatabasesController extends Controller
     }
 
     /**
+     * Returns true if a database with the given $name exists.
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    protected function databaseExists($name)
+    {
+        // FIXME: Move this to a better place, the controller should not be
+        // responsible to check if the database exists.
+        $db = config('database.connections.mysql');
+        $pdo = new PDO("mysql:host={$db['host']}", $db['username'], $db['password']);
+        $rows = $pdo->query('SHOW DATABASES;')->fetchAll(PDO::FETCH_OBJ);
+
+        foreach ($rows as $row) {
+            if ($row->Database === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Create a new database for the current authenticated user.
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreDatabase $request)
     {
+        if ($this->databaseExists($request->name)) {
+            return response()->json([], 400);
+        }
+
         $process = new Process([
             base_path('scripts/create-database'),
             $request->name,

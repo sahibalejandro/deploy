@@ -115,8 +115,8 @@ class DatabasesTest extends TestCase
      */
     protected function assertDatabaseAndUserDoesNotExists($database, $user)
     {
-        $config = config('database.connections.mysql');
-        $pdo = new PDO('mysql:host=127.0.0.1', $config['username'], $config['password']);
+        $db = config('database.connections.mysql');
+        $pdo = new PDO("mysql:host={$db['host']}", $db['username'], $db['password']);
 
         // First check that the database does not exists.
         $rows = $pdo->query('SHOW DATABASES;')->fetchAll(PDO::FETCH_OBJ);
@@ -179,6 +179,18 @@ class DatabasesTest extends TestCase
         $this->json('POST', '/api/databases', ['user' => 'loooooooooooooong'])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['user']);
+    }
+
+    /** @test */
+    public function do_not_create_new_database_if_it_already_exists()
+    {
+        $database = $this->createTestDatabase();
+
+        $this->json('POST', '/api/databases', [
+            'name' => $database->name,
+            'user' => 'another_user',
+            'password' => 'secretpassword',
+        ])->assertStatus(400);
     }
 
     public function test_creates_a_new_database()
