@@ -2,6 +2,7 @@ import './bootstrap';
 
 import Vue from 'vue';
 import router from './router';
+import './vue-directives';
 
 import TheHeader from './components/the-header.vue';
 import TheFooter from './components/the-footer.vue';

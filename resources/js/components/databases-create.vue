@@ -4,7 +4,7 @@
         <form @submit.prevent="submit">
             <div class="form-group">
                 <label for="name">Database name</label>
-                <input v-model="database.name" type="text" id="name" class="form-control" :class="{ 'is-invalid': form.errors.has('name') }" maxlength="30">
+                <input v-model="database.name" v-focus type="text" id="name" class="form-control" :class="{ 'is-invalid': form.errors.has('name') }" maxlength="30">
                 <div class="invalid-feedback" v-if="form.errors.has('name')" v-text="form.errors.get('name')"></div>
             </div>
 
