@@ -20,6 +20,11 @@
                 <div class="invalid-feedback" v-if="form.errors.has('password')" v-text="form.errors.get('password')"></div>
             </div>
 
+            <div class="form-group">
+                <label for="password_confirmation">Confirm password</label>
+                <input v-model="database.password_confirmation" type="password" id="password_confirmation" class="form-control">
+            </div>
+
             <div class="mt-5 text-right">
                 <button type="submit" class="btn btn-primary" :disabled="form.isPending">Add New Database</button>
             </div>
@@ -38,6 +43,7 @@ export default {
                 name: null,
                 user: null,
                 password: null,
+                password_confirmation: null,
             },
         };
     },

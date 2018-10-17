@@ -27,7 +27,7 @@ class StoreDatabase extends FormRequest
         return [
             'name' => ['required', 'regex:/^([a-z0-9_]){8,30}$/i', new UniqueDatabase],
             'user' => ['required', 'regex:/^([a-z0-9_]){8,16}$/i'],
-            'password' => ['required'],
+            'password' => ['required', 'confirmed'],
         ];
     }
 }

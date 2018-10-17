@@ -90,6 +90,22 @@ class DatabasesTest extends TestCase
     }
 
     /** @test */
+    public function it_checks_the_password_must_be_confirmed()
+    {
+        $this->json('POST', '/api/databases', ['password' => 'secret'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['password']);
+
+        $this->json('POST', '/api/databases', ['password' => 'secret', 'password_confirmation' => 'secret_wrong'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['password']);
+
+        $this->json('POST', '/api/databases', ['password' => 'secret', 'password_confirmation' => 'secret'])
+            ->assertStatus(422)
+            ->assertJsonMissingValidationErrors(['password']);
+    }
+
+    /** @test */
     public function do_not_create_new_database_if_it_already_exists()
     {
         $database = $this->createTestDatabase();
@@ -110,7 +126,7 @@ class DatabasesTest extends TestCase
         $dbName = '_test_database';
         $dbUser = '_test_user';
         $dbPass = 'secretpassword';
-        $input = ['name' => $dbName, 'user' => $dbUser, 'password' => $dbPass];
+        $input = ['name' => $dbName, 'user' => $dbUser, 'password' => $dbPass, 'password_confirmation' => $dbPass];
 
         $this->json('POST', '/api/databases', $input)
             ->assertStatus(201)
