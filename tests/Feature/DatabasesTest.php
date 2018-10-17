@@ -67,6 +67,9 @@ class DatabasesTest extends TestCase
         $this->json('POST', '/api/databases', ['name' => '-'])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['name']);
+
+        $this->json('POST', '/api/databases', ['name' => 'valid_name'])
+            ->assertJsonMissingValidationErrors(['name']);
     }
 
     /** @test */
@@ -87,6 +90,9 @@ class DatabasesTest extends TestCase
         $this->json('POST', '/api/databases', ['user' => 'loooooooooooooong'])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['user']);
+
+        $this->json('POST', '/api/databases', ['user' => 'valid_user'])
+            ->assertJsonMissingValidationErrors(['user']);
     }
 
     /** @test */
