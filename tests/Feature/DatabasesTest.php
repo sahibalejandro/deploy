@@ -93,12 +93,15 @@ class DatabasesTest extends TestCase
     public function do_not_create_new_database_if_it_already_exists()
     {
         $database = $this->createTestDatabase();
-
-        $this->json('POST', '/api/databases', [
+        $input = [
             'name' => $database->name,
             'user' => 'another_user',
             'password' => 'secretpassword',
-        ])->assertStatus(400);
+        ];
+
+        $this->json('POST', '/api/databases', $input)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
     }
 
     /** @test */

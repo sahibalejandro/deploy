@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\UniqueDatabase;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreDatabase extends FormRequest
@@ -24,7 +25,7 @@ class StoreDatabase extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'regex:/^([a-z0-9_]){8,20}$/i'],
+            'name' => ['required', 'regex:/^([a-z0-9_]){8,30}$/i', new UniqueDatabase],
             'user' => ['required', 'regex:/^([a-z0-9_]){8,16}$/i'],
             'password' => ['required'],
         ];

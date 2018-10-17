@@ -16,7 +16,7 @@ class CreateDatabasesTable extends Migration
         Schema::create('databases', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->string('name', 20);
+            $table->string('name', 30);
             $table->string('user', 16);
             $table->timestamps();
 
