@@ -16,7 +16,7 @@ class CreateSitesTable extends Migration
         Schema::create('sites', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->string('name');
+            $table->string('name', 50);
             $table->string('repository');
             $table->boolean('installed')->default(false);
             $table->text('install_error')->nullable();

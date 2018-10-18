@@ -80,7 +80,7 @@ export default {
          */
         async loadSiteData() {
             try {
-                let {data} = await axios.get(`/api/sites/${this.$route.params.id}`);
+                let {data} = await axios.get(`sites/${this.$route.params.id}`);
                 this.site = data;
             } catch (err) {
                 // TODO: Display an alert to notify that the site doesn't exists.
