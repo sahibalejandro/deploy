@@ -17,9 +17,10 @@
         <!-- Status: Installation failed -->
         <div v-if="site.install_error">
             <div class="alert alert-danger">
-                <strong>An error occurred during site installation:</strong>
-                <div class="text-monospace">{{ site.install_error}}</div>
+                An error occurred during site installation!
             </div>
+            <div class="mb-2"><strong>Output:</strong></div>
+            <pre class="pre-scrollable border rounded text-secondary bg-light p-3">{{ site.install_error }}</pre>
         </div>
 
         <!-- Status: Installation running -->
@@ -80,7 +81,7 @@ export default {
          */
         async loadSiteData() {
             try {
-                let {data} = await axios.get(`/api/sites/${this.$route.params.id}`);
+                let {data} = await axios.get(`sites/${this.$route.params.id}`);
                 this.site = data;
             } catch (err) {
                 // TODO: Display an alert to notify that the site doesn't exists.

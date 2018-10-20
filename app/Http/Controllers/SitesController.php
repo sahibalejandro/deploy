@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Site;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreSite;
 use App\Jobs\CloneSiteRepository;
 
 class SitesController extends Controller
@@ -24,11 +25,15 @@ class SitesController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(StoreSite $request)
     {
-        $site = auth()->user()->sites()->save(
-            new Site($request->only('name', 'repository'))
+        $input = $request->only(
+            'name',
+            'git_platform',
+            'repository'
         );
+
+        $site = auth()->user()->sites()->save(new Site($input));
 
         // Dispatch the job to clone the repository, this job
         // is queued and handled by the super queue worker.

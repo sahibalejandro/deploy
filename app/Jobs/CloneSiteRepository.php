@@ -9,6 +9,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class CloneSiteRepository implements ShouldQueue
 {
@@ -19,7 +20,7 @@ class CloneSiteRepository implements ShouldQueue
      *
      * @var \App\Site
      */
-    protected $site;
+    public $site;
 
     /**
      * Create a new job instance.
@@ -44,12 +45,12 @@ class CloneSiteRepository implements ShouldQueue
         // Abort the installation process if the path exists or if it cannot
         // be created, in those cases we mark the installation as failed.
         if (file_exists($path)) {
-            $this->failedInstallation("Directory {$path} already exists");
+            $this->failedInstallation("Directory {$path} already exists.");
             return;
         }
 
         if (!mkdir($path, 0766, true)) {
-            $this->failedInstallation("Can't create directory {$path}");
+            $this->failedInstallation("Unable to create directory: {$path}");
             return;
         }
 
@@ -67,7 +68,7 @@ class CloneSiteRepository implements ShouldQueue
             $process->mustRun();
             $this->successfulInstallation();
         } catch (ProcessFailedException $e) {
-            $this->failedInstallation($e->getMessage);
+            $this->failedInstallation($process->getErrorOutput());
         }
     }
 

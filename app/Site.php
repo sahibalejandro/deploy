@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Site extends Model
 {
-    protected $fillable = ['name', 'repository'];
+    protected $fillable = ['name', 'git_platform', 'repository'];
 }

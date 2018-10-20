@@ -1,23 +1,55 @@
 <template>
     <div>
-        <h4>Add new site</h4>
+        <h4 class="mb-5">New Site</h4>
         <form @submit.prevent="submit">
             <div class="form-group">
-                <label for="name">Site name:</label>
-                <input class="form-control" type="text" id="name" v-model="site.name">
+                <label for="name">Site name</label>
+                <input
+                    v-model="site.name"
+                    v-focus
+                    type="text"
+                    id="name"
+                    class="form-control"
+                    :class="{ 'is-invalid': form.errors.has('name') }"
+                    maxlength="50"
+                >
+                <div
+                    class="invalid-feedback"
+                    v-if="form.errors.has('name')"
+                    v-text="form.errors.get('name')"
+                ></div>
+            </div>
+
+            <h5>Repository</h5>
+
+            <div class="form-group">
+                <label for="git_platform">Platform</label>
+                <select v-model="site.git_platform" id="git_platform" class="form-control">
+                    <option value="github">GitHub</option>
+                    <option value="bitbucket">BitBucket</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label for="repository">Repository:</label>
-                <input class="form-control" type="text" id="repository" v-model="site.repository">
-                <small class="form-text text-muted">
-                    The url to clone over SSH, for example:
-                    <span class="text-monospace">git@github.com:user/repository.git</span>
-                </small>
+                <label for="repository">Repository Name</label>
+                <input
+                    v-model="site.repository"
+                    type="text"
+                    id="repository"
+                    class="form-control"
+                    :class="{ 'is-invalid': form.errors.has('repository') }"
+                    placeholder="vendor/repository"
+                    maxlength="100"
+                >
+                <div
+                    class="invalid-feedback"
+                    v-if="form.errors.has('repository')"
+                    v-text="form.errors.get('repository')"
+                ></div>
             </div>
 
-            <div class="mt-3 text-center">
-                <button class="btn btn-primary" type="submit" :disabled="form.isPending">Save site</button>
+            <div class="mt-5 text-right">
+                <button class="btn btn-primary" type="submit" :disabled="form.isPending">Add New Site</button>
             </div>
         </form>
     </div>
@@ -29,15 +61,23 @@ import Form from 'form-object';
 export default {
     data() {
         return {
-            site: {name: null, repository: null},
+            site: {
+                name: null,
+                repository: null,
+                git_platform: 'github',
+            },
             form: new Form()
         }
     },
 
     methods: {
         async submit() {
-            const site = await this.form.post('/api/sites', this.site);
-            this.$router.replace({name: 'sites.show', params: {id: site.id}});
+            let site = await this.form.post('sites', this.site)
+                .catch(error => console.warn(error.message));
+
+            if (site) {
+                this.$router.replace({name: 'sites.show', params: {id: site.id}});
+            }
         }
     }
 }

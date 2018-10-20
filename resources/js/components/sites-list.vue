@@ -24,7 +24,7 @@ export default {
 
     methods: {
         async loadSites() {
-            const res = await axios.get('/api/sites');
+            const res = await axios.get('sites');
             this.sites = res.data;
         }
     }
