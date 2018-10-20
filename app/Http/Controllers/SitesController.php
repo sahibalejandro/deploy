@@ -27,9 +27,13 @@ class SitesController extends Controller
      */
     public function store(StoreSite $request)
     {
-        $site = auth()->user()->sites()->save(
-            new Site($request->only('name', 'repository'))
+        $input = $request->only(
+            'name',
+            'git_platform',
+            'repository'
         );
+
+        $site = auth()->user()->sites()->save(new Site($input));
 
         // Dispatch the job to clone the repository, this job
         // is queued and handled by the super queue worker.

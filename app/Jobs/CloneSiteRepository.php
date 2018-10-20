@@ -20,7 +20,7 @@ class CloneSiteRepository implements ShouldQueue
      *
      * @var \App\Site
      */
-    protected $site;
+    public $site;
 
     /**
      * Create a new job instance.

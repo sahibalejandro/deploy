@@ -17,7 +17,8 @@ class CreateSitesTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->string('name', 50);
-            $table->string('repository');
+            $table->string('git_platform');
+            $table->string('repository', 100);
             $table->boolean('installed')->default(false);
             $table->text('install_error')->nullable();
             $table->timestamps();

@@ -20,24 +20,32 @@
                 ></div>
             </div>
 
+            <h5>Repository</h5>
+
             <div class="form-group">
-                <label for="repository">Repository</label>
+                <label for="git_platform">Platform</label>
+                <select v-model="site.git_platform" id="git_platform" class="form-control">
+                    <option value="github">GitHub</option>
+                    <option value="bitbucket">BitBucket</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="repository">Repository Name</label>
                 <input
                     v-model="site.repository"
                     type="text"
                     id="repository"
                     class="form-control"
                     :class="{ 'is-invalid': form.errors.has('repository') }"
+                    placeholder="vendor/repository"
+                    maxlength="100"
                 >
                 <div
                     class="invalid-feedback"
                     v-if="form.errors.has('repository')"
                     v-text="form.errors.get('repository')"
                 ></div>
-                <small class="form-text text-muted">
-                    Use the url to clone over SSH, for example:
-                    <span class="text-monospace">git@github.com:user/repository.git</span>
-                </small>
             </div>
 
             <div class="mt-5 text-right">
@@ -53,7 +61,11 @@ import Form from 'form-object';
 export default {
     data() {
         return {
-            site: {name: null, repository: null},
+            site: {
+                name: null,
+                repository: null,
+                git_platform: 'github',
+            },
             form: new Form()
         }
     },

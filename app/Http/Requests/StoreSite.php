@@ -25,7 +25,8 @@ class StoreSite extends FormRequest
     {
         return [
             'name' => 'required',
-            'repository' => ['required', 'regex:/^git\@github\.com:.+\/.+\.git$/'],
+            'git_platform' => 'required',
+            'repository' => ['required', 'regex:/^[^\/]+\/[^\/]+$/'],
         ];
     }
 }
