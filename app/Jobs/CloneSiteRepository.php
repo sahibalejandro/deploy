@@ -60,7 +60,7 @@ class CloneSiteRepository implements ShouldQueue
         $process = new Process([
             'git',
             'clone',
-            $this->site->repository,
+            $this->site->ssh_url,
             $path,
         ]);
 
