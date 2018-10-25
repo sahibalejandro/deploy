@@ -27,6 +27,7 @@ class StoreSite extends FormRequest
             'name' => 'required',
             'git_platform' => 'required',
             'repository' => ['required', 'regex:/^[^\/]+\/[^\/]+$/'],
+            'deployment_script' => 'required',
         ];
     }
 }

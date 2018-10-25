@@ -66,6 +66,16 @@ class SitesTest extends TestCase
     }
 
     /** @test */
+    public function it_validates_that_deployment_script_field_is_required()
+    {
+        $this->json('POST', '/api/sites', ['deployment_script' => ''])
+            ->assertJsonValidationErrors('deployment_script');
+
+        $this->json('POST', '/api/sites', ['deployment_script' => 'npm run production'])
+            ->assertJsonMissingValidationErrors('deployment_script');
+    }
+
+    /** @test */
     public function it_store_a_new_site()
     {
         Queue::fake();
@@ -76,6 +86,7 @@ class SitesTest extends TestCase
             'name' => $site->name,
             'git_platform' => $site->git_platform,
             'repository' => $site->repository,
+            'deployment_script' => 'deploy this'
         ];
 
         $this->json('POST', '/api/sites', $input)->assertStatus(201);
@@ -86,6 +97,7 @@ class SitesTest extends TestCase
             'repository' => $site->repository,
             'installed' => 0,
             'install_error' => null,
+            'deployment_script' => 'deploy this',
         ]);
 
         Queue::assertPushed(CloneSiteRepository::class, function ($job) {

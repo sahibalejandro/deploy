@@ -21,7 +21,6 @@
             </div>
 
             <h5>Repository</h5>
-
             <div class="form-group">
                 <label for="git_platform">Platform</label>
                 <select v-model="site.git_platform" id="git_platform" class="form-control">
@@ -46,6 +45,12 @@
                     v-if="form.errors.has('repository')"
                     v-text="form.errors.get('repository')"
                 ></div>
+            </div>
+
+            <h5>Deployment</h5>
+            <div class="form-group">
+                <p>Set your custom deployment script</p>
+                <textarea v-model="site.deployment_script" id="deployment_script" class="form-control" rows="5"></textarea>
             </div>
 
             <div class="mt-5 text-right">

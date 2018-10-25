@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Site extends Model
 {
-    protected $fillable = ['name', 'git_platform', 'repository'];
+    protected $fillable = ['name', 'git_platform', 'repository', 'deployment_script'];
 
     /**
      * Return the repository ssh url based on its git_plataform attribute.

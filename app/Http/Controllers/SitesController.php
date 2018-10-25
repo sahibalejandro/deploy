@@ -30,7 +30,8 @@ class SitesController extends Controller
         $input = $request->only(
             'name',
             'git_platform',
-            'repository'
+            'repository',
+            'deployment_script'
         );
 
         $site = auth()->user()->sites()->save(new Site($input));
