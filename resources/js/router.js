@@ -17,7 +17,7 @@ const router = new VueRouter({
         {
             path: '/sites/:id',
             name: 'sites.show',
-            component: require('./components/sites-show.vue'),
+            component: require('./components/sites.show.vue'),
         },
 
         {
