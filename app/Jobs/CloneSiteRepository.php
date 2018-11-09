@@ -40,7 +40,7 @@ class CloneSiteRepository implements ShouldQueue
     public function handle()
     {
         // This is the path where the site will be installed.
-        $path = config('deploy.path') . "/site_{$this->site->id}";
+        $path = $this->site->getPath();
 
         // Abort the installation process if the path exists or if it cannot
         // be created, in those cases we mark the installation as failed.

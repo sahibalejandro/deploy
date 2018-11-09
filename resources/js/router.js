@@ -12,23 +12,23 @@ const router = new VueRouter({
         {
             path: '/sites/create',
             name: 'sites.create',
-            component: require('./components/sites-create.vue'),
+            component: require('./components/sites.create.vue'),
         },
         {
             path: '/sites/:id',
             name: 'sites.show',
-            component: require('./components/sites-show.vue'),
+            component: require('./components/sites.show.vue'),
         },
 
         {
             path: '/databases',
             name: 'databases.index',
-            component: require('./components/databases-index.vue'),
+            component: require('./components/databases.index.vue'),
         },
         {
             path: '/databases/create',
             name: 'databases.create',
-            component: require('./components/databases-create.vue'),
+            component: require('./components/databases.create.vue'),
         },
     ]
 });

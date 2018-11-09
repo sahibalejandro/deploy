@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import moxios from 'moxios';
 import Form from 'form-object';
 import {mount, createLocalVue} from '@vue/test-utils'
-import SitesCreate from '../../resources/js/components/sites-create.vue';
+import SitesCreate from '../../resources/js/components/sites.create.vue';
 
 describe('Sites Create', () => {
     let localVue;

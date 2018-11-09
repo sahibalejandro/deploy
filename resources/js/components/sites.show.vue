@@ -1,13 +1,13 @@
 <template>
     <div>
-        <h4>Site {{ site.name }}</h4>
+        <h4>{{ site.name }}</h4>
 
         <!-- Site's information -->
-        <strong>Repository:</strong>
-        {{ site.repository }}
+        <code>{{ site.ssh_url }}</code>
+        <hr>
 
         <!-- Site status -->
-        <h5 class="border-bottom">Status</h5>
+        <h5>Status</h5>
 
         <!-- Status: Installed -->
         <div v-if="site.installed" class="alert alert-success">
@@ -27,11 +27,20 @@
         <div v-if="installationIsPending()" class="text-muted">
             Installing the site, this can take a while.
         </div>
+
+        <h5>Environment File</h5>
+        <p>Deploying a Laravel application? Edit here your <code>.env</code> file.</p>
+        <!-- Probably we should listen for an event when the contents change, but YAGNI -->
+        <env-file v-if="site.id" :site-id="site.id" :initial-contents="site.env_file_contents" />
     </div>
 </template>
 
 <script>
+import EnvFile from './env-file.vue';
+
 export default {
+
+    components: {EnvFile},
 
     /**
      * Identifier for the setInterval(...) for monitoring the status.
@@ -47,15 +56,7 @@ export default {
      */
     data() {
         return {
-            /**
-             * Site data.
-             */
-            site: {
-                name: null,
-                repository: null,
-                installed: null,
-                install_error: null,
-            },
+            site: {},
         };
     },
 

@@ -44,6 +44,19 @@ class SitesController extends Controller
     }
 
     /**
+     * Save the contents of the env file for the given $site.
+     *
+     * @param  \App\Site $site
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeEnvFile(Site $site)
+    {
+        $site->setEnvFileContents(request('contents'));
+
+        return $site;
+    }
+
+    /**
      * Display the detail page for the given site.
      *
      * @param  \App\Site $site
