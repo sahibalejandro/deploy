@@ -30,7 +30,8 @@
 
         <h5>Environment File</h5>
         <p>Deploying a Laravel application? Edit here your <code>.env</code> file.</p>
-        <env-file :site-id="site.id" :initial-content="site.env_file" />
+        <!-- Probably we should listen for an event when the contents change, but YAGNI -->
+        <env-file v-if="site.id" :site-id="site.id" :initial-contents="site.env_file_contents" />
     </div>
 </template>
 
