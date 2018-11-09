@@ -16,13 +16,15 @@ class SiteTest extends TestCase
     public function setUp()
     {
         parent::setUp();
+        // We use "site_1" as deployment path since each test will start with a
+        // clean database.
         exec('mkdir -p "' . config('deploy.path') . '/site_1"');
     }
 
     public function tearDown()
     {
         exec('rm -rf "' . config('deploy.path') . '"');
-        parent::setUp();
+        parent::tearDown();
     }
 
     /** @test */
