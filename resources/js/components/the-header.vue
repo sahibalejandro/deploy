@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <div class="container">
-            <router-link class="navbar-brand" to="/">Deployer</router-link>
+            <router-link class="navbar-brand" to="/">Deploy</router-link>
             <!-- General Menu -->
             <ul class="navbar-nav mr-auto">
                 <li class="navbar-item">
