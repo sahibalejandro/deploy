@@ -17,7 +17,7 @@
         <div id="app">
             <the-header></the-header>
             <alert-message></alert-message>
-            <div class="container rounded bg-white shadow-sm mt-4 pt-3 pb-5">
+            <div class="container rounded bg-white shadow-sm mt-4 py-3">
                 <router-view></router-view>
             </div>
             <the-footer></the-footer>

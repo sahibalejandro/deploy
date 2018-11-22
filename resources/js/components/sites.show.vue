@@ -1,37 +1,41 @@
 <template>
     <div>
-        <h4>{{ site.name }}</h4>
+        <div v-if="loading">Loading site information...</div>
 
-        <!-- Site's information -->
-        <code>{{ site.ssh_url }}</code>
-        <hr>
+        <div v-if="site">
+            <h4>{{ site.name }}</h4>
 
-        <!-- Site status -->
-        <h5>Status</h5>
+            <!-- Site's information -->
+            <code>{{ site.ssh_url }}</code>
+            <hr>
 
-        <!-- Status: Installed -->
-        <div v-if="site.installed" class="alert alert-success">
-            Site is installed correctly.
-        </div>
+            <!-- Site status -->
+            <h5>Status</h5>
 
-        <!-- Status: Installation failed -->
-        <div v-if="site.install_error">
-            <div class="alert alert-danger">
-                An error occurred during site installation!
+            <!-- Status: Installed -->
+            <div v-if="site.installed" class="alert alert-success">
+                Site is installed correctly.
             </div>
-            <div class="mb-2"><strong>Output:</strong></div>
-            <pre class="pre-scrollable border rounded text-secondary bg-light p-3">{{ site.install_error }}</pre>
-        </div>
 
-        <!-- Status: Installation running -->
-        <div v-if="installationIsPending()" class="text-muted">
-            Installing the site, this can take a while.
-        </div>
+            <!-- Status: Installation failed -->
+            <div v-if="site.install_error">
+                <div class="alert alert-danger">
+                    An error occurred during site installation!
+                </div>
+                <div class="mb-2"><strong>Output:</strong></div>
+                <pre class="pre-scrollable border rounded text-secondary bg-light p-3">{{ site.install_error }}</pre>
+            </div>
 
-        <h5>Environment File</h5>
-        <p>Deploying a Laravel application? Edit here your <code>.env</code> file.</p>
-        <!-- Probably we should listen for an event when the contents change, but YAGNI -->
-        <env-file v-if="site.id" :site-id="site.id" :initial-contents="site.env_file_contents" />
+            <!-- Status: Installation running -->
+            <div v-if="installationIsPending()" class="text-muted">
+                Installing the site, this can take a while.
+            </div>
+
+            <h5>Environment File</h5>
+            <p>Deploying a Laravel application? Edit here your <code>.env</code> file.</p>
+            <!-- Probably we should listen for an event when the contents change, but YAGNI -->
+            <env-file :site-id="site.id" :initial-contents="site.env_file_contents" />
+        </div>
     </div>
 </template>
 
@@ -56,7 +60,8 @@ export default {
      */
     data() {
         return {
-            site: {},
+            site: null,
+            loading: true,
         };
     },
 
@@ -66,7 +71,10 @@ export default {
      * @return void
      */
     created() {
-        this.loadSiteData();
+        this.loadSiteData().then(() => {
+            this.loading = false;
+        });
+
         this.startRefreshing();
     },
 
