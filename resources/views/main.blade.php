@@ -21,6 +21,7 @@
                 <router-view></router-view>
             </div>
             <the-footer></the-footer>
+            <portal-target name="modal-outlet"></portal-target>
         </div>
         <script src="{{ mix('/js/app.js') }}"></script>
     </body>

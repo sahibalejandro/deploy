@@ -31,20 +31,24 @@
                 Installing the site, this can take a while.
             </div>
 
-            <h5>Environment File</h5>
-            <p>Deploying a Laravel application? Edit here your <code>.env</code> file.</p>
-            <!-- Probably we should listen for an event when the contents change, but YAGNI -->
-            <env-file :site-id="site.id" :initial-contents="site.env_file_contents" />
+            <a href="#" @click.prevent="showingEnvFile = true" class="btn btn-light">Edit .env file</a>
+            <portal to="modal-outlet" v-if="showingEnvFile">
+                <modal-overlay @close="showingEnvFile = false">
+                    <!-- Probably we should listen for an event when the contents change, but YAGNI -->
+                    <env-file @saved="showingEnvFile = false" :site-id="site.id" :initial-contents="site.env_file_contents" />
+                </modal-overlay>
+            </portal>
         </div>
     </div>
 </template>
 
 <script>
 import EnvFile from './env-file.vue';
+import ModalOverlay from './modal-overlay.vue';
 
 export default {
 
-    components: {EnvFile},
+    components: {EnvFile, ModalOverlay},
 
     /**
      * Identifier for the setInterval(...) for monitoring the status.
@@ -62,6 +66,7 @@ export default {
         return {
             site: null,
             loading: true,
+            showingEnvFile: false,
         };
     },
 

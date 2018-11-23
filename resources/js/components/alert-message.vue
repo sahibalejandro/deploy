@@ -20,5 +20,6 @@
         right: 20px;
         top: 20px;
         min-width: 345px;
+        z-index: 2;
     }
 </style>
