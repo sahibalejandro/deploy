@@ -44,6 +44,20 @@ class SitesController extends Controller
     }
 
     /**
+     * Handle the request to update the site's information.
+     *
+     * @param  Site      $site
+     * @param  StoreSite $request
+     * @return Illuminate\Http\JsonResponse
+     */
+    public function update(Site $site, StoreSite $request)
+    {
+        // Note: Currently the only updateable field is "deployment_script".
+        $site->update($request->only('deployment_script'));
+        return $site;
+    }
+
+    /**
      * Save the contents of the env file for the given $site.
      *
      * @param  \App\Site $site

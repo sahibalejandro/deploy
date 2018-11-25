@@ -2,10 +2,10 @@
     <div>
         <h4 class="mb-4">Edit .env file</h4>
         <div class="form-group">
-            <textarea v-model="env.contents" v-focus class="form-control" rows="10" cols="100" placeholder="APP_NAME=Acme"></textarea>
+            <textarea v-model="env.contents" class="form-control text-monospace" rows="10" cols="80" placeholder="APP_NAME=Acme"></textarea>
         </div>
         <div class="text-right">
-            <button type="button" @click="save" class="btn btn-primary" :disabled="form.isPending">Save</button>
+            <button type="button" @click="save" class="btn btn-primary" :disabled="form.isPending">Update</button>
         </div>
     </div>
 </template>

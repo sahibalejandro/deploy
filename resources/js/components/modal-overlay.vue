@@ -1,6 +1,6 @@
 <template>
     <div class="modal-overlay">
-        <div class="modal-overlay-content">
+        <div class="modal-overlay-content shadow-lg">
             <a class="btn btn-light modal-overlay-close" href="#" @click.prevent="$emit('close')">Close</a>
             <slot></slot>
         </div>
@@ -12,11 +12,11 @@
         animation-name: modal-overlay-fade-in;
         animation-duration: 500ms;
         animation-iteration-count: 1;
-        background-color: rgba(0, 0, 0, 0.5);
+        animation-fill-mode: forwards;
         position: fixed;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
         top: 0;
         left: 0;
         width: 100vw;
@@ -29,6 +29,7 @@
         padding: 2rem;
         border-radius: 4px;
         position: relative;
+        margin-top: 80px;
     }
 
     .modal-overlay-close {
@@ -43,7 +44,7 @@
         }
 
         100% {
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.25);
         }
     }
 </style>

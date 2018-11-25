@@ -31,20 +31,39 @@
                 Installing the site, this can take a while.
             </div>
 
-            <a href="#" @click.prevent="showingEnvFile = true" class="btn btn-light">Edit .env file</a>
+            <!-- Buttons to show/hide different sections of the form -->
+            <a href="#" @click.prevent="display('deploymentScript')" class="btn btn-light">Deployment script</a>
+            <a href="#" @click.prevent="showingEnvFile = true" class="btn btn-light">Env file</a>
+
+            <!-- Modal to edit the env file -->
             <portal to="modal-outlet" v-if="showingEnvFile">
                 <modal-overlay @close="showingEnvFile = false">
                     <!-- Probably we should listen for an event when the contents change, but YAGNI -->
                     <env-file @saved="showingEnvFile = false" :site-id="site.id" :initial-contents="site.env_file_contents" />
                 </modal-overlay>
             </portal>
-        </div>
-    </div>
+
+            <!-- Modal to edit the deployment script -->
+            <portal to="modal-outlet" v-if="isVisible('deploymentScript')">
+                <modal-overlay @close="hide('deploymentScript')">
+                    <h4 class="mb-4">Deployment Script</h4>
+                    <div class="form-group">
+                        <textarea v-model="deploymentScriptDraft" class="form-control text-monospace" cols="80" rows="10"></textarea>
+                    </div>
+                    <div class="text-right">
+                        <button @click="updateDeploymentScript" :disabled="form.isPending" type="button" class="btn btn-primary">Update</button>
+                    </div>
+                </modal-overlay>
+            </portal>
+
+        </div><!-- if (site) -->
+    </div><!-- component -->
 </template>
 
 <script>
 import EnvFile from './env-file.vue';
 import ModalOverlay from './modal-overlay.vue';
+import Form from 'form-object';
 
 export default {
 
@@ -66,7 +85,12 @@ export default {
         return {
             site: null,
             loading: true,
+            form: new Form(),
             showingEnvFile: false,
+            visibleFormSections: {
+                deploymentScript: false,
+            },
+            deploymentScriptDraft: '',
         };
     },
 
@@ -76,7 +100,8 @@ export default {
      * @return void
      */
     created() {
-        this.loadSiteData().then(() => {
+        this.loadSiteData().then(data => {
+            this.site = data;
             this.loading = false;
         });
 
@@ -96,9 +121,9 @@ export default {
         async loadSiteData() {
             try {
                 let {data} = await axios.get(`sites/${this.$route.params.id}`);
-                this.site = data;
+                return data;
             } catch (err) {
-                // TODO: Display an alert to notify that the site doesn't exists.
+                this.alert('That site does not exists.', 'danger');
                 if (err.response && err.response.status === 404) {
                     this.$router.push('/');
                 }
@@ -135,8 +160,12 @@ export default {
          *
          * @return void
          */
-        refreshData() {
-            this.loadSiteData();
+        async refreshData() {
+            let site = await this.loadSiteData();
+
+            // Update only the properties that represents the site's status.
+            this.site.installed = site.installed;
+            this.site.install_error = site.install_error;
 
             // Stop making requests for new status if the installation failed.
             if (this.site.install_error !== null) {
@@ -153,6 +182,59 @@ export default {
             // If the site is not installed and there is no installation
             // error then we can say that the installation is running.
             return !this.site.installed && !this.site.install_error;
+        },
+
+        /**
+         * Send the request to update the site's information.
+         */
+        async update() {
+            // TODO: Handle request errors.
+            await this.form.patch(`/sites/${this.site.id}`, this.site);
+        },
+
+        /**
+         * Handles the logic to update the deployment script.
+         */
+        async updateDeploymentScript() {
+            this.site.deployment_script = this.deploymentScriptDraft;
+            await this.update();
+            // TODO: Handle request errors.
+
+            this.alert('Deployment script updated.');
+            this.hide('deploymentScript');
+        },
+
+        /**
+         * Displays the form section with the given name.
+         *
+         * @param  {String} formSection
+         */
+        display(formSection) {
+            this.visibleFormSections[formSection] = true;
+            switch (formSection) {
+                case 'deploymentScript':
+                    this.deploymentScriptDraft = this.site.deployment_script;
+                    break;
+            }
+        },
+
+        /**
+         * Hides the form section with the given name.
+         *
+         * @param  {String} formSection
+         */
+        hide(formSection) {
+            this.visibleFormSections[formSection] = false;
+        },
+
+        /**
+         * Checks if the form section with the given name is visible.
+         *
+         * @param  {String} formSection
+         * @return {Boolean}
+         */
+        isVisible(formSection) {
+            return this.visibleFormSections[formSection];
         }
     }
 }

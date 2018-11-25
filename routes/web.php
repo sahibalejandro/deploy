@@ -33,6 +33,7 @@ Route::group(['prefix' => 'api'], function () {
     Route::get('/sites/{site}', 'SitesController@show');
     Route::get('/sites/{site}/status', 'SitesController@status');
     Route::post('/sites/{site}/env', 'SitesController@storeEnvFile');
+    Route::patch('/sites/{site}', 'SitesController@update');
 
     /*
      * Databases.

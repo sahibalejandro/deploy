@@ -47,12 +47,6 @@
                 ></div>
             </div>
 
-            <h5>Deployment</h5>
-            <div class="form-group">
-                <p>Set your custom deployment script</p>
-                <textarea v-model="site.deployment_script" id="deployment_script" class="form-control" rows="5"></textarea>
-            </div>
-
             <div class="mt-5 text-right">
                 <button class="btn btn-primary" type="submit" :disabled="form.isPending">Add New Site</button>
             </div>

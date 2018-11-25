@@ -66,13 +66,33 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_that_deployment_script_field_is_required()
+    public function it_updates_the_deployment_script()
     {
-        $this->json('POST', '/api/sites', ['deployment_script' => ''])
-            ->assertJsonValidationErrors('deployment_script');
+        $site = factory(Site::class)->create([
+            'user_id' => $this->user->id,
+            'deployment_script' => 'composer install',
+        ]);
 
-        $this->json('POST', '/api/sites', ['deployment_script' => 'npm run production'])
-            ->assertJsonMissingValidationErrors('deployment_script');
+        $this->assertDatabaseHas('sites', [
+            'id' => $site->id,
+            'user_id' => $this->user->id,
+            'deployment_script' => 'composer install',
+        ]);
+
+        $input = [
+            'name' => $site->name,
+            'git_platform' => $site->git_platform,
+            'repository' => $site->repository,
+            'deployment_script' => 'composer update',
+        ];
+
+        $response = $this->json('PATCH', "/api/sites/{$site->id}", $input);
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('sites', [
+            'id' => $site->id,
+            'deployment_script' => 'composer update',
+        ]);
     }
 
     /** @test */
@@ -86,7 +106,6 @@ class SitesTest extends TestCase
             'name' => $site->name,
             'git_platform' => $site->git_platform,
             'repository' => $site->repository,
-            'deployment_script' => 'deploy this'
         ];
 
         $this->json('POST', '/api/sites', $input)->assertStatus(201);
@@ -97,7 +116,7 @@ class SitesTest extends TestCase
             'repository' => $site->repository,
             'installed' => 0,
             'install_error' => null,
-            'deployment_script' => 'deploy this',
+            'deployment_script' => null,
         ]);
 
         Queue::assertPushed(CloneSiteRepository::class, function ($job) {
