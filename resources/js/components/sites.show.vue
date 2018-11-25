@@ -33,13 +33,20 @@
 
             <!-- Buttons to show/hide different sections of the form -->
             <a href="#" @click.prevent="display('deploymentScript')" class="btn btn-light">Deployment script</a>
-            <a href="#" @click.prevent="showingEnvFile = true" class="btn btn-light">Env file</a>
+            <a href="#" @click.prevent="display('envFileContents')" class="btn btn-light">Env file</a>
 
             <!-- Modal to edit the env file -->
-            <portal to="modal-outlet" v-if="showingEnvFile">
-                <modal-overlay @close="showingEnvFile = false">
-                    <!-- Probably we should listen for an event when the contents change, but YAGNI -->
-                    <env-file @saved="showingEnvFile = false" :site-id="site.id" :initial-contents="site.env_file_contents" />
+            <portal to="modal-outlet" v-if="isVisible('envFileContents')">
+                <modal-overlay @close="hide('envFileContents')">
+                    <h4 class="mb-4">Env File</h4>
+                    <div class="form-group">
+                        <textarea v-model="envFileContentsDraft" class="form-control text-monospace" cols="80" rows="10"></textarea>
+                    </div>
+                    <div class="text-right">
+                        <button @click="updateEnvFileContents" class="btn btn-primary" type="button" :disabled="form.isPending">
+                            Update
+                        </button>
+                    </div>
                 </modal-overlay>
             </portal>
 
@@ -51,7 +58,9 @@
                         <textarea v-model="deploymentScriptDraft" class="form-control text-monospace" cols="80" rows="10"></textarea>
                     </div>
                     <div class="text-right">
-                        <button @click="updateDeploymentScript" :disabled="form.isPending" type="button" class="btn btn-primary">Update</button>
+                        <button @click="updateDeploymentScript" class="btn btn-primary" type="button" :disabled="form.isPending">
+                            Update
+                        </button>
                     </div>
                 </modal-overlay>
             </portal>
@@ -61,13 +70,12 @@
 </template>
 
 <script>
-import EnvFile from './env-file.vue';
 import ModalOverlay from './modal-overlay.vue';
 import Form from 'form-object';
 
 export default {
 
-    components: {EnvFile, ModalOverlay},
+    components: {ModalOverlay},
 
     /**
      * Identifier for the setInterval(...) for monitoring the status.
@@ -87,9 +95,13 @@ export default {
             loading: true,
             form: new Form(),
             showingEnvFile: false,
+
             visibleFormSections: {
+                envFileContents: false,
                 deploymentScript: false,
             },
+
+            envFileContentsDraft: '',
             deploymentScriptDraft: '',
         };
     },
@@ -188,20 +200,46 @@ export default {
          * Send the request to update the site's information.
          */
         async update() {
-            // TODO: Handle request errors.
             await this.form.patch(`/sites/${this.site.id}`, this.site);
+        },
+
+        /**
+         * Handles the logic to update the env file contents.
+         */
+        async updateEnvFileContents() {
+            try {
+                await this.form.post(`sites/${this.site.id}/env`, {contents: this.envFileContentsDraft});
+                this.site.env_file_contents = this.envFileContentsDraft;
+                this.alert('Env file contents updated.');
+                this.hide('envFileContents')
+            } catch (error) {
+                this.alert(error.toString(), 'danger');
+            }
         },
 
         /**
          * Handles the logic to update the deployment script.
          */
         async updateDeploymentScript() {
-            this.site.deployment_script = this.deploymentScriptDraft;
-            await this.update();
-            // TODO: Handle request errors.
+            let unmodifiedDeploymentScript = this.site.deployment_script;
 
-            this.alert('Deployment script updated.');
-            this.hide('deploymentScript');
+            // Mutate the state so the update() method sends the updated values.
+            // If the request fails then we will have to revert this change.
+            this.site.deployment_script = this.deploymentScriptDraft;
+
+            try {
+                await this.update();
+                this.alert('Deployment script updated.');
+                this.hide('deploymentScript');
+            } catch (error) {
+                this.alert(error.toString(), 'danger');
+
+                // When the error contains a response object it means the request
+                // failed and we need to revert the changes made to the state.
+                if (error.response) {
+                    this.site.deployment_script = unmodifiedDeploymentScript;
+                }
+            }
         },
 
         /**
@@ -214,6 +252,9 @@ export default {
             switch (formSection) {
                 case 'deploymentScript':
                     this.deploymentScriptDraft = this.site.deployment_script;
+                    break;
+                case 'envFileContents':
+                    this.envFileContentsDraft = this.site.env_file_contents;
                     break;
             }
         },
