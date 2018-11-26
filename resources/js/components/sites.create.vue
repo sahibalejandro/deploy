@@ -48,7 +48,7 @@
             </div>
 
             <div class="mt-5 text-right">
-                <button class="btn btn-primary" type="submit" :disabled="form.isPending">Add New Site</button>
+                <c-button class="btn btn-primary" type="submit" :disabled="form.isPending">Add New Site</c-button>
             </div>
         </form>
     </div>

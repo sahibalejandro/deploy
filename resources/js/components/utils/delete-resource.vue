@@ -4,9 +4,9 @@ Events:
     error: When the request to delete the resource fails.
 -->
 <template>
-    <button type="button" class="btn btn-danger" @click.prevent="askConfirmation" :disabled="loading">
+    <c-button type="button" class="btn btn-danger" @click="askConfirmation" :disabled="loading">
         <slot>Delete</slot>
-    </button>
+    </c-button>
 </template>
 
 <script>

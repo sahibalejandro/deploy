@@ -25,7 +25,7 @@
                             endpoint="databases"
                             class="btn-sm"
                             @delete="removeFromList(database)"
-                        >&times;</delete-resource>
+                        ></delete-resource>
                     </td>
                 </tr>
             </tbody>

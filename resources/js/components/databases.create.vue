@@ -26,7 +26,7 @@
             </div>
 
             <div class="mt-5 text-right">
-                <button type="submit" class="btn btn-primary" :disabled="form.isPending">Add New Database</button>
+                <c-button type="submit" class="btn btn-primary" :disabled="form.isPending">Add New Database</c-button>
             </div>
         </form>
     </div>

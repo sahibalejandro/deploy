@@ -43,9 +43,9 @@
                         <textarea v-model="envFileContentsDraft" class="form-control text-monospace" cols="80" rows="10"></textarea>
                     </div>
                     <div class="text-right">
-                        <button @click="updateEnvFileContents" class="btn btn-primary" type="button" :disabled="form.isPending">
+                        <c-button @click="updateEnvFileContents" class="btn btn-primary" :disabled="form.isPending">
                             Update
-                        </button>
+                        </c-button>
                     </div>
                 </modal-overlay>
             </portal>
@@ -58,9 +58,9 @@
                         <textarea v-model="deploymentScriptDraft" class="form-control text-monospace" cols="80" rows="10"></textarea>
                     </div>
                     <div class="text-right">
-                        <button @click="updateDeploymentScript" class="btn btn-primary" type="button" :disabled="form.isPending">
+                        <c-button @click="updateDeploymentScript" class="btn btn-primary" type="button" :disabled="form.isPending">
                             Update
-                        </button>
+                        </c-button>
                     </div>
                 </modal-overlay>
             </portal>

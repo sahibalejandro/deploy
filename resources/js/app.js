@@ -10,8 +10,10 @@ import './vue-global-mixin';
 import TheHeader from './components/the-header.vue';
 import TheFooter from './components/the-footer.vue';
 import AlertMessage from './components/alert-message.vue';
+import CButton from './components/utils/c-button.vue';
 
 Vue.use(PortalVue);
+Vue.component('c-button', CButton);
 
 const app = new Vue({
     store,
